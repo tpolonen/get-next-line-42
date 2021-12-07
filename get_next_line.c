@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/05 18:19:21 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/07 16:21:47 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static t_list	*new_buf(const int fd)
 	t_list 	*new_list;	
 
 	fd_to_str = ft_itoa(fd);
-	content_size = ft_intlen(fd, 10) + 1 + BUFF_SIZE;
+	content_size = ft_strlen(fd_to_str) + 1 + BUFF_SIZE;
 	new_str = ft_dstrnew(fd_to_str, content_size);
 	ft_memdel((void **)&fd_to_str);
 	new_list = (t_list *) malloc(sizeof(t_list));
@@ -45,14 +45,9 @@ static t_list	*get_buf(const int fd, t_list **bufs)
 		return (*bufs);
 	}
 	seek = *bufs;
-	while (1)
+	while (ft_atoi((char *)seek->content) != fd)
 	{
-		if (ft_atoi((char *)seek->content) == fd)
-		{
-			ft_putendl("we found the correct fd for buf!");
-			return (seek);
-		}
-		else if (seek->next != NULL)
+		if (seek->next != NULL)
 		{
 			ft_putstr("we checked this buf but it wasn't the right one: ");
 			ft_putendl((char *)seek->content);
@@ -66,6 +61,8 @@ static t_list	*get_buf(const int fd, t_list **bufs)
 			return (seek->next);
 		}
 	}
+	ft_putendl("we found the correct fd for buf!");
+	return (seek);
 }	
 
 int	get_next_line(const int fd, char **line)
