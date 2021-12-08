@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:19:24 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/08 15:19:51 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/08 19:57:22 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ typedef struct s_buff
 {
 	int				fd;
 	char			*content;
-	unsigned long	read;
+	ssize_t			bytes;
+	ssize_t			read;
 	struct s_buff	*next;
 }				t_buff;
 

@@ -6,19 +6,27 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/08 15:21:54 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/08 19:59:46 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+static void		update_buff(t_buff *buff)
+{
+	ft_bzero(buff->content, BUFF_SIZE + 1);
+	buff->read = 0;
+	buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
+}
 
 static t_buff	*new_buff(const int fd)
 {
 	t_buff 	*new_buff;	
 
 	new_buff = (t_buff *) ft_memalloc(sizeof(t_buff));
-	new_buff->content = ft_strnew(BUFF_SIZE);
+	new_buff->content = (char *) malloc(sizeof(char) * (BUFF_SIZE + 1));
 	new_buff->fd = fd;
+	update_buff(new_buff);
 	return (new_buff);
 }
 
@@ -38,13 +46,15 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 		if (seek->next != NULL)
 		{
 			ft_putstr("we checked this buff but it wasn't the right one: ");
-			ft_putendl(seek->content);
+			ft_putnbr(seek->fd);
+			ft_putendl("");
 			seek = seek->next;
 		}
 		else
 		{
 			ft_putstr("this buff is the last one and we will create a new one after it: ");
-			ft_putendl(seek->content);
+			ft_putnbr(seek->fd);
+			ft_putendl("");
 			seek->next = new_buff(fd);
 			return (seek->next);
 		}
@@ -52,14 +62,33 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 	ft_putendl("we found the correct buff for fd!");
 	return (seek);
 }	
-/*
-char	*read_fd(t_buff *buff)
-{
-	char	*nlp;
-	char	*sp;
 
+static int	read_fd(t_buff *buff, char **line)
+{
+	t_dstr	*new_line;
+	char	*stop;
+
+	new_line = ft_dstrnew("", BUFF_SIZE);
+	while (1)
+	{
+		if (buff->bytes > 0)
+		{
+			stop = ft_memchr(buff->content + buff->read, '\n', buff->bytes - buff->read);
+			if (stop == NULL)
+				stop = buff->content + buff->bytes;
+			ft_dstradd(new_line, buff->content + buff->read, stop - buff->content - buff->read - 1);
+			buff->read = stop - buff->content - 1;
+			if (buff->read < buff->bytes - 1)
+				break ;
+		}
+		update_buff(buff);
+		if (buff->bytes <= 0)
+			return (buff->bytes);
+	}
+	*line = ft_dstrdrop(new_line);
+	return (0);
 }
-*/
+
 int	get_next_line(const int fd, char **line)
 {
 	static t_buff	*bufs;
@@ -73,6 +102,5 @@ int	get_next_line(const int fd, char **line)
 	ft_putnbr(fd_buff->fd);
 	ft_putendl("");
 	ft_putendl("-----");
-//	*line = read_fd(fd_buf);
-	return (0);
+	return (read_fd(fd_buff, line));
 }
