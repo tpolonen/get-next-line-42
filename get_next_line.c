@@ -6,78 +6,71 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/07 16:21:47 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/08 15:15:43 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-/* 
- * Check if we already have the fd open in our linked list, if not, create
- * a new one. Content size is len of fd converted to char array + \0 + BUFF_SIZE
- */
-static t_list	*new_buf(const int fd)
+static t_buff	*new_buff(const int fd)
 {
-	t_dstr	*new_str;
-	size_t	content_size;
-	char	*fd_to_str;
-	t_list 	*new_list;	
+	t_buff 	*new_buff;	
 
-	fd_to_str = ft_itoa(fd);
-	content_size = ft_strlen(fd_to_str) + 1 + BUFF_SIZE;
-	new_str = ft_dstrnew(fd_to_str, content_size);
-	ft_memdel((void **)&fd_to_str);
-	new_list = (t_list *) malloc(sizeof(t_list));
-	new_list->content = ft_dstrdrop(new_str);
-	new_list->content_size = content_size;
-	new_list->next = NULL;
-	return (new_list);
+	new_buff = (t_buff *) ft_memalloc(sizeof(t_buff));
+	new_buff->content = ft_strnew(BUFF_SIZE);
+	new_buff->fd = fd;
+	return (new_buff);
 }
 
-static t_list	*get_buf(const int fd, t_list **bufs)
+static t_buff	*get_buff(const int fd, t_buff **bufs)
 {
-	t_list	*seek;
+	t_buff	*seek;
 
 	if (*bufs == NULL)
 	{
-		ft_putendl("new list, creating buf");
-		*bufs = new_buf(fd);
+		ft_putendl("first run, creating buff");
+		*bufs = new_buff(fd);
 		return (*bufs);
 	}
 	seek = *bufs;
-	while (ft_atoi((char *)seek->content) != fd)
+	while (seek->fd != fd)
 	{
 		if (seek->next != NULL)
 		{
-			ft_putstr("we checked this buf but it wasn't the right one: ");
-			ft_putendl((char *)seek->content);
+			ft_putstr("we checked this buff but it wasn't the right one: ");
+			ft_putendl(seek->content);
 			seek = seek->next;
 		}
 		else
 		{
-			ft_putstr("this buf is the last one and we will create a new one after it: ");
-			ft_putendl((char *)seek->content);
-			seek->next = new_buf(fd);
+			ft_putstr("this buff is the last one and we will create a new one after it: ");
+			ft_putendl(seek->content);
+			seek->next = new_buff(fd);
 			return (seek->next);
 		}
 	}
-	ft_putendl("we found the correct fd for buf!");
+	ft_putendl("we found the correct buff for fd!");
 	return (seek);
 }	
+/*
+char	*read_fd(t_buff *buff)
+{
+	char	*nlp;
+	char	*sp;
 
+}
+*/
 int	get_next_line(const int fd, char **line)
 {
-	static t_list	*bufs;
-	t_list			*fd_buf;
+	static t_buff	*bufs;
+	t_buff			*fd_buff;
 
 	(void)line;
-	fd_buf = get_buf(fd, &bufs);
-	ft_putendl((char *)fd_buf->content);
-	ft_putnbr(fd_buf->content_size);
-	ft_putendl("");
-	ft_putstr("list size currently: ");
-	ft_putnbr(ft_lstcount(bufs));
+	fd_buff = get_buff(fd, &bufs);
+	ft_putendl(fd_buff->content);
+	ft_putnbr(fd_buff->fd);
 	ft_putendl("");
 	ft_putendl("-----");
+//	*line = read_fd(fd_buf);
 	return (0);
 }
