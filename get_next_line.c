@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/08 15:15:43 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/08 15:21:54 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,9 @@ int	get_next_line(const int fd, char **line)
 
 	(void)line;
 	fd_buff = get_buff(fd, &bufs);
-	ft_putendl(fd_buff->content);
+	ft_putstr("sizeof t_buff struct: ");
+	ft_putnbr(sizeof(t_buff));
+	ft_putstr("\nfd: ");
 	ft_putnbr(fd_buff->fd);
 	ft_putendl("");
 	ft_putendl("-----");
