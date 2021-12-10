@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/09 18:40:20 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/10 15:43:23 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,12 @@
 
 static void	update_buff(t_buff *buff)
 {
-	ft_bzero(buff->content, BUFF_SIZE + 1);
 	buff->read = 0;
 	buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
+	if (buff->bytes > 0)
+		buff->content[buff->bytes] = '\0';
+	else
+		buff->content[0] = '\0';
 }
 
 static t_buff	*new_buff(const int fd)
@@ -24,8 +27,11 @@ static t_buff	*new_buff(const int fd)
 	t_buff	*new_buff;	
 
 	new_buff = (t_buff *) ft_memalloc(sizeof(t_buff));
-	new_buff->content = (char *) malloc(sizeof(char) * (BUFF_SIZE + 1));
-	new_buff->fd = fd;
+	if (new_buff)
+	{
+		new_buff->content = (char *) malloc(sizeof(char) * (BUFF_SIZE + 1));
+		new_buff->fd = fd;
+	}
 	return (new_buff);
 }
 
@@ -50,13 +56,10 @@ static int	read_fd(t_buff *buff, char **line)
 	t_dstr	*new_line;
 	char	*stop;
 
-	new_line = ft_dstrnew("", BUFF_SIZE);
+	new_line = ft_dstrnew("", 512);
 	while (buff->bytes > 0)
 	{
-		stop = ft_memchr(buff->content + buff->read,
-				'\n', buff->bytes - buff->read);
-		if (stop == NULL)
-			stop = buff->content + buff->bytes;
+		stop = ft_strchrnul(buff->content + buff->read, '\n');
 		ft_dstradd(new_line, buff->content + buff->read,
 			(stop - buff->read) - buff->content);
 		buff->read = stop - buff->content + 1;
@@ -67,7 +70,7 @@ static int	read_fd(t_buff *buff, char **line)
 	if (!line)
 		ft_dstrfree(new_line);
 	else
-		*line = ft_dstrdrop(new_line);
+		*line = ft_dstrbreak(new_line);
 	return (1);
 }
 
