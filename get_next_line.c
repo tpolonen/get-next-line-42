@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/12 15:46:04 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/12 17:49:46 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	get_next_line(const int fd, char **line)
 	t_buff			*fd_buff;
 
 	fd_buff = get_buff(fd, &bufs);
-	if (!fd_buff)
+	if (!fd_buff || !line)
 		return (-1);
 	if (fd_buff->bytes <= 0 || fd_buff->read >= fd_buff->bytes)
 	{
@@ -103,9 +103,6 @@ static int	read_fd(t_buff *buff, char **line)
 		buff->read = 0;
 		buff->bytes = read(buff->fd, buff->content, (size_t)BUFF_SIZE);
 	}
-	if (!line)
-		ft_dstrfree(new_line);
-	else
-		*line = ft_dstrbreak(new_line);
+	*line = ft_dstrbreak(new_line);
 	return (1);
 }
