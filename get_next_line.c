@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/13 03:08:57 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/13 03:39:01 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@ static int		read_fd(t_buff *buff, char **line);
  *
  * On unreasonable BUFF_SIZE values and other rare occasions allocation of
  * buffer might fail: in that case we also return -1.
+ *
+ * Line being NULL is also considered an error here and will return -1
+ * before we even try to read the fd.
  */
 int	get_next_line(const int fd, char **line)
 {
@@ -42,7 +45,7 @@ int	get_next_line(const int fd, char **line)
 }
 
 /*
- * Results from read(2) are saved in t_buff struct, which contain 
+ * Results from read(2) are saved in t_buff struct, which contains
  * the fd used, amount of bytes that have been read, total amount of bytes 
  * and the buffer itself.
  *
@@ -58,7 +61,6 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 	t_buff	*target;
 	t_buff	**new;
 
-	new = bufs;
 	if (*bufs != NULL)
 	{
 		target = *bufs;
@@ -68,11 +70,14 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 			return (target);
 		new = &(target->next);
 	}
+	else
+		new = bufs;
 	*new = (t_buff *) ft_memalloc(sizeof(t_buff));
 	if (*new)
 	{
 		(*new)->fd = fd;
-		(*new)->content = (char *) malloc((size_t)BUFF_SIZE);
+		(*new)->content = (char *) malloc((size_t)BUFF_SIZE
+				* (size_t)(sizeof(char)));
 		if (!(*new)->content)
 			ft_memdel((void **)new);
 	}
@@ -80,11 +85,21 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 }
 
 /*
- * Line is constructed inside a dynamic string struct that stores
- * the string itself, it's len and currently allocated memory.
- * It can be expanded with ft_dstradd -function, which copies
- * the new string to the end of the currently stored string
- * and allocates new memory for it if necessary.
+ * Line is constructed inside a dynamic string struct that stores the string 
+ * itself, it's len and currently allocated memory. We allocate some default
+ * amount of bytes for the new line - most likely the average line length 
+ * has nothing to do with the buffer size.
+ *
+ * The struct can be expanded with ft_dstradd -function, which copies
+ * the new string to the end of the currently stored string and allocates 
+ * new memory for it if necessary.
+ *
+ * ft_dstrbreak will return the string contained in the struct in a freshly
+ * allocated char pointer - the actual allocated size of the dynamic string
+ * might be different than the length of the content, so it is better to
+ * reallocate a new pointer with size that matches the string.
+ * The function will also free the struct and the string contained in it,
+ * so memory won't be leaked.
  */
 static int	read_fd(t_buff *buff, char **line)
 {
