@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/13 14:45:13 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/13 15:13:11 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,9 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
  * reallocate a new pointer with size that matches the string.
  * The function will also free the struct and the string contained in it,
  * so memory won't be leaked.
+ *
+ * If allocation of the new_line fails at any point, nothing is put to
+ * line and -1 is returned.
  */
 static int	read_fd(t_buff *buff, char **line)
 {
