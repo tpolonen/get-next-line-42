@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/13 03:00:36 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/13 03:08:57 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 	if (*bufs != NULL)
 	{
 		target = *bufs;
-		while (target->fd != fd && target->next == NULL)
+		while (target->fd != fd && target->next != NULL)
 			target = target->next;
 		if (target->fd == fd)
 			return (target);
