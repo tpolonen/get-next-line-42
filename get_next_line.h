@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:19:24 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/12 17:19:15 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/13 15:41:31 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 # include "libft.h"
 # include <unistd.h>
 # include <stdlib.h>
-# define BUFF_SIZE 2048
+# define BUFF_SIZE 32 
 
 typedef struct s_buff
 {
