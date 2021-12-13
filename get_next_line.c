@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/13 03:39:01 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/13 14:45:13 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,20 +107,25 @@ static int	read_fd(t_buff *buff, char **line)
 	char	*stop;
 
 	new_line = ft_dstrnew("", 128);
-	while (buff->bytes > 0)
+	while (new_line != NULL && buff->bytes > 0)
 	{
 		stop = ft_memchr(buff->content + buff->read, '\n',
 				buff->bytes - buff->read);
 		if (stop == NULL)
 			stop = buff->content + buff->bytes;
-		ft_dstradd(new_line, buff->content + buff->read,
-			(stop - buff->read) - buff->content);
+		if (ft_dstradd(new_line, buff->content + buff->read,
+				(stop - buff->read) - buff->content) < 0)
+			ft_dstrfree(new_line);
 		buff->read = stop - buff->content + 1;
 		if (buff->read <= buff->bytes)
 			break ;
 		buff->read = 0;
 		buff->bytes = read(buff->fd, buff->content, (size_t)BUFF_SIZE);
 	}
-	*line = ft_dstrbreak(new_line);
-	return (1);
+	if (new_line)
+	{
+		*line = ft_dstrbreak(new_line);
+		return (1);
+	}
+	return (-1);
 }
