@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/12 17:49:46 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/13 02:47:03 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,25 +55,32 @@ int	get_next_line(const int fd, char **line)
  */
 static t_buff	*get_buff(const int fd, t_buff **bufs)
 {
-	t_buff	**target;
+	t_buff	*target;
+	t_buff	**new;
 
-	target = bufs;
-	while (*target != NULL)
+	new = bufs;
+	if (*bufs != NULL)
 	{
-		if ((*target)->fd == fd)
-			return (*target);
-		*target = (*target)->next;
+		target = *bufs;
+		while (1)
+		{
+			if (target->fd == fd)
+				return (target);
+			if (target->next == NULL)
+				break ;
+			target = target->next;
+		}
+		new = &(target->next);
 	}
-	*target = (t_buff *) ft_memalloc(sizeof(t_buff));
-	if (*target)
+	*new = (t_buff *) ft_memalloc(sizeof(t_buff));
+	if (*new)
 	{
-		(*target)->fd = fd;
-		(*target)->content = (char *) malloc((size_t)BUFF_SIZE
-				* (size_t)(sizeof(char)));
-		if (!(*target)->content)
-			ft_memdel((void **)target);
+		(*new)->fd = fd;
+		(*new)->content = (char *) malloc((size_t)BUFF_SIZE);
+		if (!(*new)->content)
+			ft_memdel((void **)new);
 	}
-	return (*target);
+	return (*new);
 }
 
 /*
