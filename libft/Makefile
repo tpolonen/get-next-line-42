@@ -6,14 +6,14 @@
 #    By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/11/12 19:01:12 by tpolonen          #+#    #+#              #
-#    Updated: 2021/12/13 15:50:39 by tpolonen         ###   ########.fr        #
+#    Updated: 2021/12/14 23:23:43 by tpolonen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
 CFLAGS = -c -Wall -Wextra -Werror -I$(HEADER_DIR)
 ARFLAGS = rc
-HEADER_DIR = ./includes/
+HEADER_DIR = ./
 NAME = libft.a
 
 FILES := ft_abs.c

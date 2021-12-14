@@ -6,43 +6,11 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/13 15:38:48 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/14 23:26:18 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-static t_buff	*get_buff(const int fd, t_buff **bufs);
-static int		read_fd(t_buff *buff, char **line);
-
-/* 
- * If the buffer is empty or fully read we try to update it once:
- * 0 or -1 means that there is no need to read the buffer anymore and we can
- * just return the result from the read(2) call.
- *
- * On unreasonable BUFF_SIZE values and other rare occasions allocation of
- * buffer might fail: in that case we also return -1.
- *
- * Line being NULL is also considered an error here and will return -1
- * before we even try to read the fd.
- */
-int	get_next_line(const int fd, char **line)
-{
-	static t_buff	*bufs;
-	t_buff			*fd_buff;
-
-	fd_buff = get_buff(fd, &bufs);
-	if (!fd_buff || !line)
-		return (-1);
-	if (fd_buff->bytes <= 0 || fd_buff->read >= fd_buff->bytes)
-	{
-		fd_buff->read = 0;
-		fd_buff->bytes = read(fd_buff->fd, fd_buff->content, (size_t)BUFF_SIZE);
-		if (fd_buff->bytes <= 0)
-			return (fd_buff->bytes);
-	}
-	return (read_fd(fd_buff, line));
-}
 
 /*
  * Results from read(2) are saved in t_buff struct, which contains
@@ -130,4 +98,33 @@ static int	read_fd(t_buff *buff, char **line)
 	if (new_line && *line)
 		return (1);
 	return (-1);
+}
+
+/* 
+ * If the buffer is empty or fully read we try to update it once:
+ * 0 or -1 means that there is no need to read the buffer anymore and we can
+ * just return the result from the read(2) call.
+ *
+ * On unreasonable BUFF_SIZE values and other rare occasions allocation of
+ * buffer might fail: in that case we also return -1.
+ *
+ * Line being NULL is also considered an error here and will return -1
+ * before we even try to read the fd.
+ */
+int	get_next_line(const int fd, char **line)
+{
+	static t_buff	*bufs;
+	t_buff			*fd_buff;
+
+	fd_buff = get_buff(fd, &bufs);
+	if (!fd_buff || !line)
+		return (-1);
+	if (fd_buff->bytes <= 0 || fd_buff->read >= fd_buff->bytes)
+	{
+		fd_buff->read = 0;
+		fd_buff->bytes = read(fd_buff->fd, fd_buff->content, (size_t)BUFF_SIZE);
+		if (fd_buff->bytes <= 0)
+			return (fd_buff->bytes);
+	}
+	return (read_fd(fd_buff, line));
 }
