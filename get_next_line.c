@@ -6,11 +6,17 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/15 00:11:07 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/15 17:37:50 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+static void	update_buff(t_buff *buff)
+{
+	buff->read = 0;
+	buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
+}
 
 /*
  * Results from read(2) are saved in t_buff struct, which contains
@@ -19,7 +25,7 @@
  *
  * This function will create a new struct when fd is accessed the first time, 
  * or if the fd has been used previously, the previous results will be returned.
- * Structs are saved in a linked list, so only one static variable is used.
+ * Structs are saved in a linked manner, so only one static variable is used.
  *
  * If the allocation of new t_buff struct fails, this function returns NULL
  * which is treated as an error in the main function.
@@ -45,7 +51,7 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 	{
 		(*new)->fd = fd;
 		(*new)->content = (char *) malloc((size_t)BUFF_SIZE
-				* (size_t)(sizeof(char)));
+				* (sizeof(char)));
 		if (!(*new)->content)
 			ft_memdel((void **)new);
 	}
@@ -90,8 +96,7 @@ static int	read_fd(t_buff *buff, char **line)
 		buff->read = stop - buff->content + 1;
 		if (buff->read <= buff->bytes)
 			break ;
-		buff->read = 0;
-		buff->bytes = read(buff->fd, buff->content, (size_t)BUFF_SIZE);
+		update_buff(buff);
 	}
 	if (new_line)
 		*line = ft_dstrbreak(new_line);
@@ -123,8 +128,7 @@ int	get_next_line(const int fd, char **line)
 		return (-1);
 	if (fd_buff->bytes <= 0 || fd_buff->read >= fd_buff->bytes)
 	{
-		fd_buff->read = 0;
-		fd_buff->bytes = read(fd_buff->fd, fd_buff->content, (size_t)BUFF_SIZE);
+		update_buff(fd_buff);
 		if (fd_buff->bytes <= 0)
 			return (fd_buff->bytes);
 	}
