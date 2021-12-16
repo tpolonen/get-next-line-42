@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/15 17:37:50 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/16 18:18:14 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,7 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 	if (*new)
 	{
 		(*new)->fd = fd;
-		(*new)->content = (char *) malloc((size_t)BUFF_SIZE
-				* (sizeof(char)));
+		(*new)->content = (char *) malloc(BUFF_SIZE * (sizeof(char)));
 		if (!(*new)->content)
 			ft_memdel((void **)new);
 	}
