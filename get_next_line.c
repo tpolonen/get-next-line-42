@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/17 19:42:56 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/17 20:04:12 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,9 +138,10 @@ static int	read_fd(t_buff *buff, char **line)
 		update_buff(buff);
 	}
 	if (new_line)
+	{
 		*line = ft_dstrbreak(&new_line);
-	if (new_line && *line)
-		return (1);
+		if (*line)
+			return (1);
+	}
 	return (-1);
 }
-
