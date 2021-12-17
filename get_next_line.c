@@ -6,14 +6,14 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/17 20:04:12 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/17 20:25:12 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static void		update_buff(t_buff *buff);
 static t_buff	*get_buff(const int fd, t_buff **bufs);
+static void		update_buff(t_buff *buff);
 static int		read_fd(t_buff *buff, char **line);
 
 /* 
@@ -29,12 +29,12 @@ static int		read_fd(t_buff *buff, char **line);
  */
 int	get_next_line(const int fd, char **line)
 {
-	static t_buff	*bufs;
+	static t_buff	*buffs;
 	t_buff			*fd_buff;
 
 	if (fd < 0 || !line)
 		return (-1);
-	fd_buff = get_buff(fd, &bufs);
+	fd_buff = get_buff(fd, &buffs);
 	if (!fd_buff)
 		return (-1);
 	if (fd_buff->bytes <= 0 || (ssize_t)fd_buff->offset >= fd_buff->bytes)
@@ -44,18 +44,6 @@ int	get_next_line(const int fd, char **line)
 			return (fd_buff->bytes);
 	}
 	return (read_fd(fd_buff, line));
-}
-
-/*
- * We reuse the same pointer that was allocated during the creation
- * of buffer to minimize costly malloc/free calls.
- * Bytes-value can store all results from read(2) call without
- * over/underflowing.
- */
-static void	update_buff(t_buff *buff)
-{
-	buff->offset = 0;
-	buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
 }
 
 /*
@@ -70,14 +58,14 @@ static void	update_buff(t_buff *buff)
  * If the allocation of new t_buff struct fails, this function returns NULL
  * which is treated as an error in the main function.
  */
-static t_buff	*get_buff(const int fd, t_buff **bufs)
+static t_buff	*get_buff(const int fd, t_buff **buffs)
 {
 	t_buff	*target;
 	t_buff	**new;
 
-	if (*bufs != NULL)
+	if (*buffs != NULL)
 	{
-		target = *bufs;
+		target = *buffs;
 		while (target->fd != fd && target->next != NULL)
 			target = target->next;
 		if (target->fd == fd)
@@ -85,7 +73,7 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 		new = &(target->next);
 	}
 	else
-		new = bufs;
+		new = buffs;
 	*new = (t_buff *) ft_memalloc(sizeof(t_buff));
 	if (*new)
 	{
@@ -95,6 +83,18 @@ static t_buff	*get_buff(const int fd, t_buff **bufs)
 			ft_memdel((void **)new);
 	}
 	return (*new);
+}
+
+/*
+ * We reuse the same pointer that was allocated during the creation
+ * of buffer to minimize costly malloc/free calls.
+ * Bytes-value can store all results from read(2) call without
+ * over/underflowing.
+ */
+static void	update_buff(t_buff *buff)
+{
+	buff->offset = 0;
+	buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
 }
 
 /*
