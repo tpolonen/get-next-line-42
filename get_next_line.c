@@ -6,15 +6,55 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/16 18:18:14 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/17 19:42:56 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+static void		update_buff(t_buff *buff);
+static t_buff	*get_buff(const int fd, t_buff **bufs);
+static int		read_fd(t_buff *buff, char **line);
+
+/* 
+ * If the buffer is empty or fully read we try to update it once:
+ * 0 or -1 means that there is no need to read the buffer anymore and we can
+ * just return the result from the read(2) call.
+ *
+ * On unreasonable BUFF_SIZE values and other rare occasions allocation of
+ * buffer might fail: in that case we also return -1.
+ *
+ * Line being NULL is also considered an error here and will return -1
+ * before we even try to read the fd.
+ */
+int	get_next_line(const int fd, char **line)
+{
+	static t_buff	*bufs;
+	t_buff			*fd_buff;
+
+	if (fd < 0 || !line)
+		return (-1);
+	fd_buff = get_buff(fd, &bufs);
+	if (!fd_buff)
+		return (-1);
+	if (fd_buff->bytes <= 0 || (ssize_t)fd_buff->offset >= fd_buff->bytes)
+	{
+		update_buff(fd_buff);
+		if (fd_buff->bytes <= 0)
+			return (fd_buff->bytes);
+	}
+	return (read_fd(fd_buff, line));
+}
+
+/*
+ * We reuse the same pointer that was allocated during the creation
+ * of buffer to minimize costly malloc/free calls.
+ * Bytes-value can store all results from read(2) call without
+ * over/underflowing.
+ */
 static void	update_buff(t_buff *buff)
 {
-	buff->read = 0;
+	buff->offset = 0;
 	buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
 }
 
@@ -85,51 +125,22 @@ static int	read_fd(t_buff *buff, char **line)
 	new_line = ft_dstrnew("", 128);
 	while (new_line != NULL && buff->bytes > 0)
 	{
-		stop = ft_memchr(buff->content + buff->read, '\n',
-				buff->bytes - buff->read);
+		stop = ft_memchr(buff->content + buff->offset, '\n',
+				buff->bytes - buff->offset);
 		if (stop == NULL)
 			stop = buff->content + buff->bytes;
-		if (ft_dstradd(new_line, buff->content + buff->read,
-				(stop - buff->read) - buff->content) < 0)
-			ft_dstrfree(new_line);
-		buff->read = stop - buff->content + 1;
-		if (buff->read <= buff->bytes)
+		if (ft_dstradd(new_line, buff->content + buff->offset,
+				(stop - buff->offset) - buff->content) < 0)
+			ft_dstrfree(&new_line);
+		buff->offset = stop - buff->content + 1;
+		if ((ssize_t)buff->offset <= buff->bytes)
 			break ;
 		update_buff(buff);
 	}
 	if (new_line)
-		*line = ft_dstrbreak(new_line);
+		*line = ft_dstrbreak(&new_line);
 	if (new_line && *line)
 		return (1);
 	return (-1);
 }
 
-/* 
- * If the buffer is empty or fully read we try to update it once:
- * 0 or -1 means that there is no need to read the buffer anymore and we can
- * just return the result from the read(2) call.
- *
- * On unreasonable BUFF_SIZE values and other rare occasions allocation of
- * buffer might fail: in that case we also return -1.
- *
- * Line being NULL is also considered an error here and will return -1
- * before we even try to read the fd.
- */
-int	get_next_line(const int fd, char **line)
-{
-	static t_buff	*bufs;
-	t_buff			*fd_buff;
-
-	if (fd < 0 || !line)
-		return (-1);
-	fd_buff = get_buff(fd, &bufs);
-	if (!fd_buff)
-		return (-1);
-	if (fd_buff->bytes <= 0 || fd_buff->read >= fd_buff->bytes)
-	{
-		update_buff(fd_buff);
-		if (fd_buff->bytes <= 0)
-			return (fd_buff->bytes);
-	}
-	return (read_fd(fd_buff, line));
-}

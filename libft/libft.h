@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 14:07:36 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/13 14:10:56 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/17 19:39:12 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,8 +122,8 @@ void	ft_lstprint(t_list *elem);
 
 t_dstr	*ft_dstrnew(const char *str, size_t len);
 ssize_t	ft_dstradd(t_dstr *ds, const char *str, size_t len);
-char	*ft_dstrdrop(t_dstr *ds);
-void	ft_dstrfree(t_dstr *ds);
-char	*ft_dstrbreak(t_dstr *ds);
+char	*ft_dstrdrop(t_dstr **ds);
+void	ft_dstrfree(t_dstr **ds);
+char	*ft_dstrbreak(t_dstr **ds);
 t_dstr	*ft_dstrconv(const char *str);
 #endif
