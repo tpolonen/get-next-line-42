@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/17 20:25:12 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/18 15:16:17 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,20 @@ static int		read_fd(t_buff *buff, char **line);
 int	get_next_line(const int fd, char **line)
 {
 	static t_buff	*buffs;
-	t_buff			*fd_buff;
+	t_buff			*buff;
 
 	if (fd < 0 || !line)
 		return (-1);
-	fd_buff = get_buff(fd, &buffs);
-	if (!fd_buff)
+	buff = get_buff(fd, &buffs);
+	if (!buff)
 		return (-1);
-	if (fd_buff->bytes <= 0 || (ssize_t)fd_buff->offset >= fd_buff->bytes)
+	if (buff->bytes <= 0 || buff->offset >= buff->bytes)
 	{
-		update_buff(fd_buff);
-		if (fd_buff->bytes <= 0)
-			return (fd_buff->bytes);
+		update_buff(buff);
+		if (buff->bytes <= 0)
+			return ((int) buff->bytes);
 	}
-	return (read_fd(fd_buff, line));
+	return (read_fd(buff, line));
 }
 
 /*
@@ -126,14 +126,14 @@ static int	read_fd(t_buff *buff, char **line)
 	while (new_line != NULL && buff->bytes > 0)
 	{
 		stop = ft_memchr(buff->content + buff->offset, '\n',
-				buff->bytes - buff->offset);
+				(size_t)(buff->bytes - buff->offset));
 		if (stop == NULL)
 			stop = buff->content + buff->bytes;
 		if (ft_dstradd(new_line, buff->content + buff->offset,
-				(stop - buff->offset) - buff->content) < 0)
+				(size_t)((stop - buff->offset) - buff->content)) < 0)
 			ft_dstrfree(&new_line);
 		buff->offset = stop - buff->content + 1;
-		if ((ssize_t)buff->offset <= buff->bytes)
+		if (buff->offset <= buff->bytes)
 			break ;
 		update_buff(buff);
 	}
