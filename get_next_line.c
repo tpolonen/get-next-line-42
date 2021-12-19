@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 01:00:49 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/20 01:24:36 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,14 @@ int	get_next_line(const int fd, char **line)
 			break ;
 	}
 	if (buff && new_line && (buff->bytes > 0 || new_line->len > 0))
+	{
 		*line = ft_dstrbreak(&new_line);
-	else if (buff && new_line)
+		return (1);
+	}
+	else if (new_line)
+	{
 		ft_dstrfree(&new_line);
-	if (buff)
-		return (buff->bytes > 0);
+		return (0);
+	}
 	return (-1);
 }
