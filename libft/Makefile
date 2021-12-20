@@ -6,12 +6,12 @@
 #    By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/11/12 19:01:12 by tpolonen          #+#    #+#              #
-#    Updated: 2021/12/18 14:31:23 by tpolonen         ###   ########.fr        #
+#    Updated: 2021/12/20 15:05:53 by tpolonen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = gcc
-CFLAGS = -c -Wall -Wextra -Werror
+CFLAGS = -g -c -Wall -Wextra -Werror
 ARFLAGS = rc
 NAME = libft.a
 
@@ -20,6 +20,8 @@ FILES += ft_atoi.c
 FILES += ft_bzero.c
 FILES += ft_dstradd.c
 FILES += ft_dstrbreak.c
+FILES += ft_dstrbuild.c
+FILES += ft_dstrclose.c
 FILES += ft_dstrconv.c
 FILES += ft_dstrdrop.c
 FILES += ft_dstrfree.c
