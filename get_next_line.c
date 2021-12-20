@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 19:49:15 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/20 20:44:19 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,10 @@ int	get_next_line(const int fd, char **line)
 	while (1)
 	{
 		if (buff->bytes <= 0 || buff->offset >= buff->bytes)
+		{
+			buff->offset = 0;
 			buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
+		}
 		if (!read_fd(buff, &new_line))
 			break ;
 	}
