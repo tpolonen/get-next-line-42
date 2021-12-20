@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:19:24 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 01:24:42 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/20 16:02:50 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,13 @@ typedef struct s_buff
 	ssize_t			offset;
 	struct s_buff	*next;
 }				t_buff;
+
+typedef struct s_dstr
+{
+	char			*str;
+	size_t			alloced;
+	size_t			len;
+}				t_dstr;
 
 int	get_next_line(const int fd, char **line);
 #endif

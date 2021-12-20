@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/13 14:07:36 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 15:11:00 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/20 16:06:38 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,6 @@ typedef struct s_list
 	size_t			content_size;
 	struct s_list	*next;
 }				t_list;
-
-typedef struct s_dstr
-{
-	char			*str;
-	size_t			alloced;
-	size_t			len;
-}				t_dstr;
 
 /*
  * Libc functions
@@ -115,17 +108,4 @@ void	ft_lstiter(t_list *lst, void (*f)(t_list *elem));
 t_list	*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 size_t	ft_lstcount(t_list *alst);
 void	ft_lstprint(t_list *elem);
-
-/*
- * Dynamic string functions
- */
-
-t_dstr	*ft_dstrnew(const char *str, size_t len);
-ssize_t	ft_dstradd(t_dstr *ds, const char *str, size_t len);
-ssize_t	ft_dstrbuild(t_dstr **ds, const char *str, size_t len);
-t_dstr	*ft_dstrconv(const char *str);
-void	ft_dstrclose(t_dstr **ds, char **target);
-char	*ft_dstrdrop(t_dstr **ds);
-void	ft_dstrfree(t_dstr **ds);
-char	*ft_dstrbreak(t_dstr **ds);
 #endif

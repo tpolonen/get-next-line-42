@@ -6,13 +6,13 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 15:54:52 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/20 17:01:01 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-ssize_t	dstrbuild(t_dstr **ds, const char *str, size_t len)
+static ssize_t	dstrbuild(t_dstr **ds, const char *str, size_t len)
 {
 	char	*new_str;
 
@@ -22,7 +22,7 @@ ssize_t	dstrbuild(t_dstr **ds, const char *str, size_t len)
 		(*ds)->str = ft_strnew(len);
 		(*ds)->alloced = len + 1;
 	}
-	if ((*ds)->alloced < (*ds)->len + len + 1)
+	else if ((*ds)->alloced < (*ds)->len + len + 1)
 	{
 		while ((*ds)->alloced < (*ds)->len + len + 1)
 			(*ds)->alloced *= 2;
@@ -39,7 +39,7 @@ ssize_t	dstrbuild(t_dstr **ds, const char *str, size_t len)
 	return ((ssize_t)(*ds)->len);
 }
 
-int	dstrclose(t_dstr **ds, char **target)
+static int	dstrclose(t_dstr **ds, char **target)
 {
 	int	ret;
 
@@ -54,6 +54,8 @@ int	dstrclose(t_dstr **ds, char **target)
 			ft_memcpy(*target, (*ds)->str, (*ds)->len);
 			ret = 1;
 		}
+		else
+			ret = -1;
 	}
 	ft_strdel(&((*ds)->str));
 	ft_memdel((void **)ds);
