@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 17:01:01 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/20 19:49:15 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 static ssize_t	dstrbuild(t_dstr **ds, const char *str, size_t len)
 {
 	char	*new_str;
+	size_t	new_size;
 
 	if (*ds == NULL)
 	{
@@ -24,14 +25,14 @@ static ssize_t	dstrbuild(t_dstr **ds, const char *str, size_t len)
 	}
 	else if ((*ds)->alloced < (*ds)->len + len + 1)
 	{
-		while ((*ds)->alloced < (*ds)->len + len + 1)
-			(*ds)->alloced *= 2;
-		new_str = (char *) malloc((*ds)->alloced);
+		new_size = ((*ds)->len + len + 1) * 2;
+		new_str = (char *) malloc(new_size * sizeof(char));
 		if (!new_str)
 			return (-1);
-		ft_memcpy((void *)new_str, (void *)(*ds)->str, (*ds)->len);
-		ft_memdel((void **)&((*ds)->str));
+		ft_memcpy((void *)new_str, (void *)(*ds)->str, (*ds)->len + 1);
+		free((*ds)->str);
 		(*ds)->str = new_str;
+		(*ds)->alloced = new_size;
 	}
 	ft_memcpy((void *)((*ds)->str + (*ds)->len), (void *)str, len);
 	(*ds)->str[(*ds)->len + len] = '\0';
@@ -57,8 +58,8 @@ static int	dstrclose(t_dstr **ds, char **target)
 		else
 			ret = -1;
 	}
-	ft_strdel(&((*ds)->str));
-	ft_memdel((void **)ds);
+	free((*ds)->str);
+	free(*ds);
 	return (ret);
 }
 
