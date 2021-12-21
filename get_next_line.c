@@ -6,7 +6,7 @@
 /*   By: tpolonen <tpolonen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/04 17:22:03 by tpolonen          #+#    #+#             */
-/*   Updated: 2021/12/20 20:44:19 by tpolonen         ###   ########.fr       */
+/*   Updated: 2021/12/21 13:40:05 by tpolonen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,21 @@ static int	dstrclose(t_dstr **ds, char **target)
 		return (ret);
 	if (target != NULL)
 	{
-		*target = ft_strnew((*ds)->len);
-		if (target)
-		{
-			ft_memcpy(*target, (*ds)->str, (*ds)->len);
-			ret = 1;
-		}
+		ret = 1;
+		if ((*ds)->alloced == (*ds)->len + 1)
+			*target = (*ds)->str;
 		else
-			ret = -1;
+		{
+			*target = ft_strnew((*ds)->len);
+			if (target)
+				ft_memcpy(*target, (*ds)->str, (*ds)->len);
+			else
+				ret = -1;
+			free((*ds)->str);
+		}
 	}
-	free((*ds)->str);
+	else
+		free((*ds)->str);
 	free(*ds);
 	return (ret);
 }
@@ -97,16 +102,17 @@ static int	read_fd(t_buff *buff, t_dstr **new_line)
 	char	*stop;
 
 	if (buff->bytes <= 0)
-		return (0);
-	if (buff->offset >= buff->bytes)
-		buff->offset = 0;
+		return (buff->bytes);
 	stop = ft_memchr(buff->content + buff->offset, '\n',
 			(size_t)(buff->bytes - buff->offset));
 	if (stop == NULL)
 		stop = buff->content + buff->bytes;
 	if (dstrbuild(new_line, buff->content + buff->offset,
 			(size_t)((stop - buff->offset) - buff->content)) < 0)
+	{
 		dstrclose(new_line, NULL);
+		return (-1);
+	}
 	buff->offset = stop - buff->content + 1;
 	if (buff->offset <= buff->bytes)
 		return (0);
@@ -118,24 +124,24 @@ int	get_next_line(const int fd, char **line)
 	static t_buff	*buffs;
 	t_buff			*buff;
 	t_dstr			*new_line;
+	int				ret;
 
 	buff = get_buff(fd, &buffs);
 	if (buff == NULL || line == NULL)
-		return (-1);
+		ret = -1;
+	else
+		ret = 1;
 	new_line = NULL;
-	while (1)
+	while (ret > 0)
 	{
 		if (buff->bytes <= 0 || buff->offset >= buff->bytes)
 		{
 			buff->offset = 0;
 			buff->bytes = read(buff->fd, buff->content, BUFF_SIZE);
 		}
-		if (!read_fd(buff, &new_line))
-			break ;
+		ret = read_fd(buff, &new_line);
 	}
-	if (new_line != NULL && (buff->bytes > 0 || new_line->len > 0))
+	if (new_line != NULL)
 		return (dstrclose(&new_line, line));
-	else if (new_line != NULL || buff->bytes == 0)
-		return (dstrclose(&new_line, NULL));
-	return (-1);
+	return (ret);
 }
